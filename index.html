@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OpenAI Prompt Input</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background-color: #2C3E50; /* Navy Blue background color */
+        }
+        .container {
+            text-align: center;
+            width: 100%;
+            max-width: 500px;
+            padding: 20px;
+            background-color: #34495E; /* Slate/Darker Grey container background */
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        h1 {
+            color: #D2B48C; /* Tan for the heading text */
+        }
+        input[type="text"] {
+            width: 100%;
+            max-width: 300px;
+            padding: 10px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border: 1px solid #8B4513; /* Brown border */
+            text-align: center;
+            background-color: #F5F5F5; /* Light background for input */
+            color: #2C3E50; /* Navy Blue text color */
+        }
+        button {
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 5px;
+            border: none;
+            background-color: #2E8B57; /* Forest Green background */
+            color: white;
+            margin-top: 10px;
+            width: 100%;
+            max-width: 100px;
+            transition: background-color 0.3s ease;
+        }
+        button:hover {
+            background-color: #246B44; /* Darker shade of Forest Green on hover */
+        }
+        textarea.response {
+            width: 100%;
+            max-width: 300px;
+            height: 150px;
+            padding: 10px;
+            margin-top: 20px;
+            font-family: Arial, sans-serif;
+            font-size: 16px;
+            resize: none;
+            white-space: pre-wrap;
+            border: none; /* Remove border */
+            outline: none;
+            background-color: transparent; /* Transparent background */
+            color: #D2B48C; /* Tan text color */
+        }
+        .loading {
+            display: none;
+            margin-top: 20px;
+        }
+        .loading.visible {
+            display: inline-block;
+        }
+        .spinner {
+            border: 4px solid #F3F3F3;
+            border-top: 4px solid #2E8B57; /* Forest Green spinner */
+            border-radius: 50%;
+            width: 24px;
+            height: 24px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>OpenAI Prompt Input</h1>
+        <input type="text" id="userInput" placeholder="Enter your prompt here...">
+        <button onclick="sendPrompt()">Submit</button>
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+        </div>
+        <textarea id="response" class="response" readonly></textarea>
+    </div>
+
+    <script>
+        async function sendPrompt() {
+            const userInput = document.getElementById('userInput').value;
+            const loadingIndicator = document.getElementById('loading');
+            const responseArea = document.getElementById('response');
+
+            // Show loading spinner and clear previous response
+            loadingIndicator.classList.add('visible');
+            responseArea.textContent = '';
+
+            try {
+                const response = await fetch('http://localhost:3000/api/prompt', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ prompt: userInput }),
+                });
+
+                const data = await response.json();
+                responseArea.textContent = data.message;
+            } catch (error) {
+                responseArea.textContent = 'Error: Could not retrieve the response.';
+            } finally {
+                // Hide loading spinner
+                loadingIndicator.classList.remove('visible');
+            }
+        }
+    </script>
+</body>
+</html>
